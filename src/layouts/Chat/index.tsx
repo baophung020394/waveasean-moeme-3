@@ -110,7 +110,7 @@ function Chat({ tokenNotification }: ChatProps) {
 
     const formData = new FormData();
     formData.append("type", "1");
-    formData.append("file", data?.image);
+    formData.append("file", data?.file);
     const response: any = await axios.post(
       "http://moa.aveapp.com:21405/file/api/fileupload_proc.jsp",
       formData,
@@ -124,7 +124,7 @@ function Chat({ tokenNotification }: ChatProps) {
       params: {
         attachment: JSON.stringify(response?.data),
         chatId: data?.idMessage,
-        messageType: data?.type,
+        messageType: response?.data.type === "image" ? "2" : "3",
         userName: data?.user.userName,
         message: "",
         userId: data?.user.userId,
@@ -132,7 +132,7 @@ function Chat({ tokenNotification }: ChatProps) {
         chatType: "0",
       },
     });
-    // setSelectedFile(data);
+    setSelectedFile(data);
   };
 
   const searchTermChange = (searchTerm: any) => {

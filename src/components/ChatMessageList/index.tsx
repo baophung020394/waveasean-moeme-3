@@ -55,22 +55,11 @@ function ChatMessageList({
         if (item.kind === "file") {
           const file = item.getAsFile();
           console.log(`… file[${i}].name = ${file.name}`);
-          // let newMessage = {
-          //   content: ``,
-          //   files: file,
-          //   idMessage: myuuid,
-          //   user: user,
-          //   timestamp: createTimestamp(),
-          //   fileType: file.type,
-          //   metadata: convertFiles(file),
-          //   type: 1,
-          // };
           const messages: any = {
             idMessage: myuuid,
             content: "",
             user: profile,
-            type: 2,
-            image: file,
+            file: file,
           };
 
           uploadFileProp(messages);
@@ -256,18 +245,18 @@ const ChatMessageListStyled = styled.div`
       }
     }
 
-    &.chat-videos {
-      .chat-text-wrapper {
-        background-color: transparent;
-        padding: 0;
+    // &.chat-videos {
+    //   .chat-text-wrapper {
+    //     background-color: transparent;
+    //     padding: 0;
 
-        video {
-          width: 100%;
-          max-width: 300px;
-          border-radius: 12px;
-        }
-      }
-    }
+    //     video {
+    //       width: 100%;
+    //       max-width: 300px;
+    //       border-radius: 12px;
+    //     }
+    //   }
+    // }
   }
 
   li {

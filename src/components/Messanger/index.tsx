@@ -76,26 +76,13 @@ function Messanger({
   const uploadChange = (e: any) => {
     if (e.target.files) {
       const file = e.target.files[0];
-
-      // let newMessage = {
-      //   content: ``,
-      //   files: file,
-      //   idMessage: myuuid,
-      //   user: userRedux,
-      //   timestamp: createTimestamp(),
-      //   fileType: file.type,
-      //   metadata: convertFiles(file),
-      //   author: {
-      //     username: userRedux?.userId || userRedux.displayName,
-      //     id: userRedux?.uid,
-      //   },
-      //   type: 1,
-      // };
+     
       const messages: any = {
         idMessage: myuuid,
         content: value.trim(),
         user: profile,
-        type: 2,
+        // type: 2,
+        file: file
       };
       uploadFileProp(messages);
       // const reader = new FileReader();

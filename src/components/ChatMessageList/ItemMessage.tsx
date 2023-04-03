@@ -43,11 +43,9 @@ function ItemMessage({
     if (message?.messageType === "12") {
       return "chat-stocks";
     } else if (message?.messageType === "3") {
-      return "chat-videos";
+      return "chat-files";
     } else if (message?.messageType === "2") {
       return "chat-images";
-    } else if (message?.messageType === "2") {
-      return "other-file";
     } else if (message?.messageType === "0") {
       return "chat-channel";
     } else if (
@@ -60,29 +58,35 @@ function ItemMessage({
 
   const renderContentFiles = () => {
     if (message?.messageType === "3") {
+      console.log("message viddeo", message);
+      console.log("message viddeo", JSON.parse(message?.attachment));
       return (
-        <div className="chat-text-wrapper">
-          {selectedFile?.timestamp === message?.timestamp &&
+        <>
+          {/* {selectedFile?.timestamp === message?.timestamp &&
             message.status === "Uploading" && (
               <>
                 <ProgressBars progressBar={progressBar} />;
               </>
-            )}
-          <video
-            onLoad={imageLoaded}
-            controls
-            src={
-              message?.status === "Uploading"
-                ? URL.createObjectURL(message?.files)
-                : message.files
-            }
-          >
-            Your browser does not support the video tag.
-          </video>
-        </div>
+            )} */}
+
+          <div className="chat-file">
+            <a download target="_blank" href={`http://moa.aveapp.com:21405/file/api/down_proc.jsp?type=1&serverfile=${JSON.parse(message?.attachment).save_file}`}>
+              <Icon name="download" />
+            </a>
+            <div className="chat-file__infor">
+              <h4>(file){JSON.parse(message?.attachment).org_file}</h4>
+              <p>
+                Out of date:~
+                {moment(JSON.parse(message?.attachment).end_date).format(
+                  "DD/MM"
+                )}
+              </p>
+              <span>Size:{JSON.parse(message?.attachment).file_size}</span>
+            </div>
+          </div>
+        </>
       );
     } else if (message?.messageType === "2") {
-      // console.log('message file', JSON.parse(message?.attachment))
       return (
         <>
           <img
@@ -98,28 +102,6 @@ function ItemMessage({
               <ProgressBars progressBar={progressBar} />
             )}
         </>
-      );
-    } else if (message?.messageType === "3") {
-      return (
-        <div className={`chat-text-wrapper`}>
-          <button
-            className="chat-text"
-            type="submit"
-            onClick={() => `${window.open(`${message.files}`)}`}
-            disabled={message.status === "Uploading"}
-            onLoad={imageLoaded}
-          >
-            {message?.metadata.name}
-          </button>
-          {selectedFile?.timestamp === message?.timestamp &&
-            message.status === "Uploading" && (
-              <ProgressBar
-                animated
-                now={progressBar?.percent}
-                label={`${progressBar?.percent}%`}
-              />
-            )}
-        </div>
       );
     } else if (message?.messageType === "12") {
       return (
@@ -288,6 +270,43 @@ const ItemMessageStyled = styled.div`
       border-bottom-left-radius: 12px;
       border-bottom-right-radius: 12px;
     }
+
+    &.chat-files {
+      .chat-file {
+        display: flex;
+
+        a {
+          width: 100%;
+          max-width: 80px;
+          min-width: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: #000
+        }
+
+        &__infor {
+          h4 {
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 129px;
+          }
+          p {
+            font-weight: bold;
+            font-size: 14px;
+          }
+          span {
+            display: block;
+            font-size: 12px;
+            color: #cacaca;
+          }
+        }
+      }
+    }
   }
 
   li.chat-right {
@@ -306,9 +325,44 @@ const ItemMessageStyled = styled.div`
       border-bottom-left-radius: 12px;
       border-bottom-right-radius: 0;
     }
-  }
 
-  
+    &.chat-files {
+      .chat-file {
+        display: flex;
+
+        a {
+          width: 100%;
+          max-width: 80px;
+          min-width: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: #fff;
+        }
+
+        &__infor {
+          h4 {
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 129px;
+          }
+          p {
+            font-weight: bold;
+            font-size: 14px;
+          }
+          span {
+            display: block;
+            font-size: 12px;
+            color: #cacaca;
+          }
+        }
+      }
+    }
+  }
 `;
 
 export default ItemMessage;

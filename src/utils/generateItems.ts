@@ -1,12 +1,10 @@
 import moment from "moment";
 
 function groupedDays(messages: any) {
-  console.log("messages group", messages);
   return messages.reduce((acc: any, el: any, i: any) => {
-    const messageDay: any = moment(el?.reg_date ? el?.reg_date : el?.regDate)
-      // .zone("+05:00")
-      .format("HH:mm DD-MM-YYYY");
-    console.log("messageDay group", messageDay);
+    const messageDay: any = moment(
+      el?.reg_date ? el?.reg_date : el?.regDate
+    ).format("HH:mm DD-MM-YYYY");
     if (acc[messageDay.replace(messageDay.slice(2, 5), "")]) {
       return {
         ...acc,
@@ -22,18 +20,10 @@ function groupedDays(messages: any) {
 
 function generateItems(messages: any) {
   const days = groupedDays(messages);
-
-  console.log("message group day", days);
-
   const sortedDays = Object.keys(days).sort((x: any, y: any) => {
-    // console.log('x',x.split(" ")[1])
-    // console.log("x", moment(x.split(" ")[1]).unix());
-    // console.log("x", new Date(x.split(" ")[1]).valueOf());
-
     return moment(x.split(" ")[1]).unix() - moment(x.split(" ")[1]).unix();
   });
 
-  console.log("message sortedDays", sortedDays);
   const items = sortedDays.reduce((acc: any, date: any, idx: number) => {
     const sortedMessages = days[date].sort((x, y) => {
       return (
