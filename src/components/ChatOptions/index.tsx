@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "utils/styled-component";
 import IconTrash from "assets/images/chat/trash.png";
 import IconSpeaker from "assets/images/chat/speaker.png";
@@ -10,14 +10,30 @@ import CreateStock from "components/CreateStock";
 import { v4 as uuidv4 } from "uuid";
 import { createTimestamp } from "utils/time";
 import { useSelector } from "react-redux";
+import { Button, Modal } from "semantic-ui-react";
+import { CONSTANT_MESSAGE_SOCKET } from "constants/messages-socket";
 
 interface ChatOptions {
   submitStock: (data: any) => void;
+  sendJsonMessage: (data: any) => void;
+  roomId: string;
 }
 
-function ChatOptions({ submitStock }: ChatOptions) {
+function ChatOptions({
+  roomId,
+  submitStock,
+  sendJsonMessage,
+
+}: ChatOptions) {
   const [isOpenStock, setIsOpenStock] = useState(false);
   const user = useSelector(({ auth }) => auth.user);
+  const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
+  const [profile] = useState(() => {
+    return JSON.parse(localStorage.getItem("_profile"));
+  });
+
+  const handleOpenDelete = () => setIsOpenDelete(true);
+  const handleCloseDelete = () => setIsOpenDelete(false);
   let myuuid = uuidv4();
 
   const onSubmit = (data: any) => {
@@ -35,11 +51,25 @@ function ChatOptions({ submitStock }: ChatOptions) {
     setIsOpenStock(false);
   };
 
+  const handleDelete = () => {
+    sendJsonMessage({
+      ptCommand: 262184,
+      ptGroup: 262144,
+      ptDevice: "",
+      params: {
+        userId: profile?.userId,
+        roomId,
+      },
+    });
+    handleCloseDelete();
+  };
+
+
   return (
     <ChatOptionsStyled>
       <div className="chat--options">
         <div className="chat--options__left">
-          <button className="btn-hover">
+          <button className="btn-hover" onClick={handleOpenDelete}>
             <img className="icon24 img-show" src={IconTrash} alt="" />
             <img className="icon24 img-hover" src={IconTrash} alt="" />
           </button>
@@ -75,6 +105,14 @@ function ChatOptions({ submitStock }: ChatOptions) {
           </div>
         </div>
       </div>
+
+      <Modal open={isOpenDelete} className="modal-confirm">
+        <h3>Do you want to delete this message?</h3>
+        <Modal.Actions>
+          <Button content="Yes" primary onClick={handleDelete} />
+          <Button content="No" secondary onClick={handleCloseDelete} />
+        </Modal.Actions>
+      </Modal>
     </ChatOptionsStyled>
   );
 }

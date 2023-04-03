@@ -77,21 +77,27 @@ function Messanger({
     if (e.target.files) {
       const file = e.target.files[0];
 
-      let newMessage = {
-        content: ``,
-        files: file,
+      // let newMessage = {
+      //   content: ``,
+      //   files: file,
+      //   idMessage: myuuid,
+      //   user: userRedux,
+      //   timestamp: createTimestamp(),
+      //   fileType: file.type,
+      //   metadata: convertFiles(file),
+      //   author: {
+      //     username: userRedux?.userId || userRedux.displayName,
+      //     id: userRedux?.uid,
+      //   },
+      //   type: 1,
+      // };
+      const messages: any = {
         idMessage: myuuid,
-        user: userRedux,
-        timestamp: createTimestamp(),
-        fileType: file.type,
-        metadata: convertFiles(file),
-        author: {
-          username: userRedux?.userId || userRedux.displayName,
-          id: userRedux?.uid,
-        },
-        type: 1,
+        content: value.trim(),
+        user: profile,
+        type: 2,
       };
-      uploadFileProp(newMessage);
+      uploadFileProp(messages);
       // const reader = new FileReader();
 
       // reader.readAsDataURL(image);
@@ -183,20 +189,16 @@ function Messanger({
         if (item.kind === "file") {
           const file = item.getAsFile();
           console.log(`… file[${i}].name = ${file.name}`);
-          let newMessage = {
-            content: ``,
-            files: file,
+         
+          const messages: any = {
             idMessage: myuuid,
-            user: userRedux,
-            timestamp: createTimestamp(),
-            fileType: file.type,
-            metadata: convertFiles(file),
-            type: 1,
+            content: value.trim(),
+            user: profile,
+            type: 2,
           };
+          // console.log("newMessage file", newMessage);
 
-          console.log("newMessage file", newMessage);
-
-          uploadFileProp(newMessage);
+          uploadFileProp(messages);
           textareaRef.current.style.border = "1px dashed #e2e2e2";
         }
       });
@@ -244,14 +246,12 @@ function Messanger({
     //   userId: userRedux.uid,
     //   // id: key,
     // };
-
     // actionsUserRef
     //   .child(currentChannel?.id)
     //   .child(userRedux.uid)
     //   .set(item)
     //   .then(() => console.log("save success"))
     //   .catch((err) => console.log({ err }));
-
     // if (e.target.value.length <= 0) {
     //   console.log("e.target.value.length", e.target.value.length);
     //   actionsUserRef
@@ -260,14 +260,12 @@ function Messanger({
     //     .update({ action: 0 });
     //   return;
     // }
-
     // if (typingTimeoutRef.current) {
     //   clearTimeout(typingTimeoutRef.current);
     // }
     // && au?.userId !== user?.uid
     // typingTimeoutRef.current = setTimeout(() => {
     //   // const key = firebase.database().ref("actionsUser").push().key;
-
     //   if (e.target.value.length <= 0) {
     //     console.log("e.target.value.length", e.target.value.length);
     //     actionsUserRef
@@ -276,7 +274,6 @@ function Messanger({
     //       .update({ action: 0 });
     //     return;
     //   }
-
     //   actionsUserRef
     //     .child(currentChannel?.id)
     //     .child(userRedux?.uid)

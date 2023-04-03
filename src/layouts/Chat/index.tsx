@@ -4,6 +4,7 @@ import {
   uploadFiles,
 } from "actions/channel";
 import { setDetailChannel } from "api/channel";
+import axios from "axios";
 import ChannelList from "components/ChannelList";
 import ChatBar from "components/ChatBar";
 import ChatMessageList from "components/ChatMessageList";
@@ -41,9 +42,10 @@ function Chat({ tokenNotification }: ChatProps) {
   const currentChannel = useSelector(({ channel }) => channel?.currentChannel);
   const isLoading = useSelector(({ channel }) => channel?.isLoading);
   const history = useHistory();
+
   const { loginSocket, sendJsonMessage, lastJsonMessage }: any =
     useWebSocketHook();
-  console.log("lastJsonMessage message rev", lastJsonMessage);
+  // console.log("lastJsonMessage message rev", lastJsonMessage);
   let myuuid = uuidv4();
 
   const sendMessages = useCallback(
@@ -98,33 +100,39 @@ function Chat({ tokenNotification }: ChatProps) {
    * Upload image
    * @param data
    */
-  const uploadImage = (data: any) => {
-    // console.log("uploadImage", data);
-    const newData = { ...data };
-    newData.author = {
-      username: userRedux?.userId || userRedux.displayName,
-      id: userRedux?.uid,
+  const uploadImage = async (data: any) => {
+    console.log("data", data);
+    let config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     };
-    newData.upload = 1;
-    newData.status = "Uploading";
-    messagesState.push(newData);
-    setSelectedFile(data);
-    dispatch(uploadFiles(data, id, messagesState, perCentUploadSuccess));
-  };
 
-  /**
-   * Count user joined channel
-   * @returns
-   */
-  const uniqueuUsersCount = () => {
-    const uniqueuUsers = messagesState?.reduce((acc, message) => {
-      if (!acc.includes(message?.author?.username)) {
-        acc.push(message?.author?.username);
-      }
-      return acc;
-    }, []);
-
-    return uniqueuUsers?.length;
+    const formData = new FormData();
+    formData.append("type", "1");
+    formData.append("file", data?.image);
+    const response: any = await axios.post(
+      "http://moa.aveapp.com:21405/file/api/fileupload_proc.jsp",
+      formData,
+      config
+    );
+    console.log("response", response);
+    sendJsonMessage({
+      ptCommand: CONSTANT_MESSAGE_SOCKET.PTCOMMAND_SEND_MESSAGE,
+      ptGroup: CONSTANT_MESSAGE_SOCKET.PTGROUP_MESSAGE,
+      ptDevice: "web",
+      params: {
+        attachment: JSON.stringify(response?.data),
+        chatId: data?.idMessage,
+        messageType: data?.type,
+        userName: data?.user.userName,
+        message: "",
+        userId: data?.user.userId,
+        roomId: id,
+        chatType: "0",
+      },
+    });
+    // setSelectedFile(data);
   };
 
   const searchTermChange = (searchTerm: any) => {
@@ -182,6 +190,11 @@ function Chat({ tokenNotification }: ChatProps) {
     });
   };
 
+  const clearMessageStateRoom = (message: any) => {
+    console.log("message nhan dc", message);
+    setMessagesState(message);
+  };
+
   useEffect(() => {
     if (id) {
       setMessagesState([]);
@@ -206,13 +219,20 @@ function Chat({ tokenNotification }: ChatProps) {
           setMessagesState(cloneParams);
           break;
         case CONSTANT_MESSAGE_SOCKET.PTCOMMAND_LIST_MESSAGE:
-          const cloneMessage = { ...lastJsonMessage };
-          cloneMessage.ownerId = lastJsonMessage.senderId;
-          setMessagesState((prevMessage) => {
-            const updateState = [...prevMessage];
-            updateState.push(cloneMessage);
-            return updateState;
-          });
+          if (
+            lastJsonMessage?.messageType === 55 &&
+            lastJsonMessage?.chatType === 4
+          ) {
+            setMessagesState([lastJsonMessage]);
+          } else {
+            const cloneMessage = { ...lastJsonMessage };
+            cloneMessage.ownerId = lastJsonMessage.senderId;
+            setMessagesState((prevMessage) => {
+              const updateState = [...prevMessage];
+              updateState.push(cloneMessage);
+              return updateState;
+            });
+          }
           break;
 
         default:
@@ -231,7 +251,6 @@ function Chat({ tokenNotification }: ChatProps) {
         <div className="chat--view__content">
           <ChatBar
             channel={currentChannel?.params}
-            uniqueuUsers={uniqueuUsersCount()}
             searchTermChange={searchTermChange}
           />
 
@@ -240,6 +259,7 @@ function Chat({ tokenNotification }: ChatProps) {
               selectedFile={selectedFile}
               progressBar={progressBar}
               uploadFileProp={uploadImage}
+              sendJsonMessage={sendJsonMessage}
               messages={
                 messagesState
                 // searchTermState ? filterMessageBySearchTerm() : messagesState
@@ -249,7 +269,11 @@ function Chat({ tokenNotification }: ChatProps) {
             {id && <TypingChat user={userRedux} id={id} />}
 
             <div className="chat--view__content__options">
-              <ChatOptions submitStock={sendMessages} />
+              <ChatOptions
+                roomId={id}
+                submitStock={sendMessages}
+                sendJsonMessage={sendJsonMessage}
+              />
             </div>
 
             <Messanger

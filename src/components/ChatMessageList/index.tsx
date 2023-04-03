@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import generateItems from "utils/generateItems";
@@ -13,6 +13,7 @@ interface ChatMessageListProps {
   progressBar?: any;
   selectedFile?: any;
   uploadFileProp?: (data: any) => void;
+  sendJsonMessage?: (data: any) => void;
 }
 
 function ChatMessageList({
@@ -20,22 +21,17 @@ function ChatMessageList({
   progressBar,
   selectedFile,
   uploadFileProp,
+  sendJsonMessage,
 }: ChatMessageListProps) {
   let myuuid = uuidv4();
-  const user = useSelector(({ auth }) => auth.user);
-
+  const [profile] = useState(() => {
+    return JSON.parse(localStorage.getItem("_profile"));
+  });
   let messagesRef: any = useRef<any>();
   let boxMessagesRef: any = useRef<any>();
 
-  console.log("messages", messages);
-  console.log("generateItems messages", generateItems(messages));
-
-  const isAuthorOf = useCallback(
-    (message: any) => {
-      return message?.author?.id === user?.uid ? "chat-right" : "chat-left";
-    },
-    [messages]
-  );
+  // console.log("messages", messages);
+  // console.log("generateItems messages", generateItems(messages));
 
   const imageLoaded = () => {
     messagesRef.scrollIntoView();
@@ -59,18 +55,25 @@ function ChatMessageList({
         if (item.kind === "file") {
           const file = item.getAsFile();
           console.log(`… file[${i}].name = ${file.name}`);
-          let newMessage = {
-            content: ``,
-            files: file,
+          // let newMessage = {
+          //   content: ``,
+          //   files: file,
+          //   idMessage: myuuid,
+          //   user: user,
+          //   timestamp: createTimestamp(),
+          //   fileType: file.type,
+          //   metadata: convertFiles(file),
+          //   type: 1,
+          // };
+          const messages: any = {
             idMessage: myuuid,
-            user: user,
-            timestamp: createTimestamp(),
-            fileType: file.type,
-            metadata: convertFiles(file),
-            type: 1,
+            content: "",
+            user: profile,
+            type: 2,
+            image: file,
           };
 
-          uploadFileProp(newMessage);
+          uploadFileProp(messages);
           boxMessagesRef.current.style.border = "unset";
         }
       });
@@ -116,36 +119,42 @@ function ChatMessageList({
       ref={boxMessagesRef}
     >
       <ul ref={messagesRef} className="chat-box chatContainerScroll">
-        {generateItems(messages).map((message: any, idx: number) => {
-          if (message?.type === "day") {
-            let convertDate = moment(parseInt(message.id[0].timestamp)).format(
-              "HH:mm DD-MM-YYYY"
-            );
+        {messages?.length > 0 &&
+          generateItems(messages).map((message: any, idx: number) => {
+            if (message?.type === "day") {
+              let convertDate = moment(
+                message?.id[0]?.reg_date
+                  ? message?.id[0]?.reg_date
+                  : message?.id[0]?.regDate
+              )
+                .zone("+05:00")
+                .calendar();
+              return (
+                <div className="chat-date" key={`${message?.id}-${idx}`}>
+                  <h1>{convertDate}</h1>
+                  {/* <h1>
+                    {moment(message?.date.split(" ")[1]).zone("+05:00").isAfter(7)
+                      ? moment(message?.date.split(" ")[1]).zone("+05:00").format(
+                          "hh DD-MM-YYYY"
+                        )
+                      : `${convertDate}`}
+                  </h1> */}
+                </div>
+              );
+            }
             return (
-              <div className="chat-date" key={`${message?.id}-${idx}`}>
-                <h1>
-                  {moment(message?.date.split(" ")[1]).isAfter(7)
-                    ? moment(parseInt(message.id[0].timestamp)).format(
-                        "HH:mm DD-MM-YYYY"
-                      )
-                    : `
-                      ${moment(convertDate, "HH:mm DD-MM-YYYY").calendar()}`}
-                </h1>
-              </div>
+              <ItemMessage
+                messages={messages}
+                message={message}
+                index={idx}
+                key={`${message?.id}-${idx}`}
+                progressBar={progressBar}
+                selectedFile={selectedFile}
+                imageLoaded={imageLoaded}
+                sendJsonMessage={sendJsonMessage}
+              />
             );
-          }
-          return (
-            <ItemMessage
-              messages={messages}
-              message={message}
-              index={idx}
-              key={`${message?.id}-${idx}`}
-              progressBar={progressBar}
-              selectedFile={selectedFile}
-              imageLoaded={imageLoaded}
-            />
-          );
-        })}
+          })}
         <div ref={(currentEl) => (messagesRef = currentEl)}></div>
       </ul>
     </ChatMessageListStyled>
@@ -197,10 +206,6 @@ const ChatMessageListStyled = styled.div`
 
   ul {
     li {
-      &:last-child {
-        // margin-bottom: 0;
-      }
-
       &.other-file {
         .chat-text-wrapper {
           .chat-text {
@@ -241,7 +246,6 @@ const ChatMessageListStyled = styled.div`
     .chat-text-wrapper {
       align-self: flex-start;
       word-break: break-all;
-
       &.hasEmoj {
         background-color: transparent;
 
@@ -252,12 +256,6 @@ const ChatMessageListStyled = styled.div`
       }
     }
 
-    &.chat-images {
-      .chat-text-wrapper {
-        background-color: #fff;
-        padding: 0;
-      }
-    }
     &.chat-videos {
       .chat-text-wrapper {
         background-color: transparent;
@@ -284,7 +282,6 @@ const ChatMessageListStyled = styled.div`
           padding: 0;
           max-width: 420px;
           width: 100%;
-          
         }
       }
     }
@@ -330,25 +327,7 @@ const ChatMessageListStyled = styled.div`
           cursor: hover;
         }
       }
-
-      & > .chat-avatar {
-        // margin-right: 20px;
-      }
-
-      & > .chat-text-wrapper {
-        background-color: #7869ef !important;
-        color: #fff;
-        border-top-right-radius: 12px;
-        border-top-left-radius: 12px;
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 0;
-      }
     }
-
-    .chat-avatar {
-      //   margin-right: 20px;
-    }
-
     .chat-name {
       font-size: 0.75rem;
       color: #999999;
@@ -359,7 +338,6 @@ const ChatMessageListStyled = styled.div`
       padding: 0.4rem 1rem;
       -webkit-border-radius: 4px;
       -moz-border-radius: 4px;
-      // background: #ffffff;
       font-weight: 300;
       line-height: 150%;
       position: relative;

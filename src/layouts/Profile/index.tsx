@@ -1,8 +1,7 @@
 import { updateProfileUser } from "actions/auth";
 import { ImageUpload } from "components/ImageUpload";
-import firebase from "db/firestore";
 import { withBaseLayout } from "layouts/Base";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
@@ -21,6 +20,9 @@ interface ProfileProps {
 }
 
 function Profile({ user }: ProfileProps) {
+  const [profile] = useState(() => {
+    return JSON.parse(localStorage.getItem("_profile"));
+  });
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isChange, setIsChange] = useState<boolean>(false);
   const [valueBio, setValueBio] = useState<string>(
@@ -73,46 +75,26 @@ function Profile({ user }: ProfileProps) {
     setIsChange(false);
   };
 
-  // useEffect(() => {
-  //   firebase
-  //     .database()
-  //     .ref("channels")
-  //     .on("value", (snap) => {
-  //       snap.forEach((sn) => {
-  //         console.log("sn", sn.val().id);
-  //         if (sn.val().id !== undefined) {
-  //           firebase
-  //             .database()
-  //             .ref("messages")
-  //             .child(sn.val().id)
-  //             .on("value", (snap) => {
-  //               console.log("mess", snap);
-  //               snap.forEach((sn) => {
-  
-  //               });
-  //             });
-  //         }
-  //       });
-  //     });
-  // }, []);
   return (
     <ProfileStyled className="profile-container">
       <Grid>
         <Grid.Column width={9}>
           <Item.Group>
             <Item>
-              {isChecking ? (
+              {/* {isChecking ? (
                 <Icon.Group size="huge">
                   <Icon loading size="big" name="circle notch" />
                 </Icon.Group>
               ) : (
                 <Item.Image size="tiny" src={user?.photoURL} avatar />
-              )}
+              )} */}
 
               <Item.Content>
-                <Item.Header as="a">{user?.username}</Item.Header>
+                <Item.Header as="a">
+                  {profile?.userName} - {profile?.userId}
+                </Item.Header>
                 <Item.Meta>Description</Item.Meta>
-                <Item.Description>
+                {/* <Item.Description>
                   <Segment>
                     <Button basic color="pink" onClick={openUpload}>
                       Update avatar
@@ -123,9 +105,9 @@ function Profile({ user }: ProfileProps) {
                       onClose={closeUpload}
                     />
                   </Segment>
-                </Item.Description>
+                </Item.Description> */}
                 <Item.Extra>Additional Details</Item.Extra>
-                <Item.Description>
+                {/* <Item.Description>
                   <Segment className="segment-input bio">
                     <Input
                       disabled={isChecking}
@@ -149,8 +131,8 @@ function Profile({ user }: ProfileProps) {
                       </Icon.Group>
                     ) : null}
                   </Segment>
-                </Item.Description>
-                <Item.Description>
+                </Item.Description> */}
+                {/* <Item.Description>
                   <Segment className="segment-input description">
                     <Form>
                       <TextArea
@@ -177,7 +159,7 @@ function Profile({ user }: ProfileProps) {
                       </Icon.Group>
                     ) : null}
                   </Segment>
-                </Item.Description>
+                </Item.Description> */}
               </Item.Content>
             </Item>
           </Item.Group>

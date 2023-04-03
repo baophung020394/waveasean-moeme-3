@@ -261,6 +261,24 @@ Css for Modals
   transform: translate(-50%, -50%);
 }
 
+.modal-confirm {
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 0 !important;
+  width: auto !important;
+  min-width: 220px;
+  padding: 1rem;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .actions {
+    border-top: none !important;
+  }
+}
 /**
 * Modal create profile
 */

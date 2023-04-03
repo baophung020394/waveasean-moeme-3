@@ -1,4 +1,5 @@
 import CustomModal from "components/CustomModal";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Button, Carousel, Modal } from "react-bootstrap";
 import {
@@ -75,7 +76,7 @@ function ChannelDetail({
       <div className="channel-detail__box">
         <div className="channel-detail__box__header">
           <h3>{channel?.room_name}</h3>
-          <p>{uniqueuUsers} joined </p>
+          <p>{uniqueuUsers} joined - Open day {moment(channel?.room_reg_date).format("YYYY.MM.DD")}</p>
         </div>
         <div className="channel-detail__box__options">
           <button className="btn-hover" onClick={() => handleCopyClipborad()}>

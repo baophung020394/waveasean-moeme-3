@@ -12,11 +12,10 @@ import SkeletonChatbar from "components/Skeleton/SkeletonChatBar";
 
 interface ChatBarProps {
   channel?: any;
-  uniqueuUsers: any;
   searchTermChange?: (e: any) => void;
 }
 
-function ChatBar({ channel, uniqueuUsers, searchTermChange }: ChatBarProps) {
+function ChatBar({ channel, searchTermChange }: ChatBarProps) {
   const [isOpenInput, setIsOpenInput] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const isLoading = useSelector(({ channel }) => channel?.isLoading);

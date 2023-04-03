@@ -17,6 +17,7 @@ import { getAccessToken } from "services/TokenService";
 import StoreProvider from "store/StoreProvider";
 import Header from "./components/common/Header";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import ProfileView from "layouts/Profile";
 
 export const AuthRoute = ({ children, ...rest }: any) => {
   const token = useSelector(({ auth }) => auth.token);
@@ -50,109 +51,6 @@ function MoeMe() {
       type: "SET_TOKEN_SUCCESS",
     });
   }, [dispatch]);
-  
-  // const { sendJsonMessage, readyState, getWebSocket } = useWebSocket(
-  //   "wss://moeme-web-dev.aveapp.com",
-  //   {
-  //     onOpen: () => console.log("opened"),
-  //     onMessage: (data) => {
-  //       console.log("readyState", readyState);
-  //       console.log("data", JSON.parse(data.data));
-  //       const message = JSON.parse(data.data);
-  //       switch (message?.ptCommand) {
-  //         case 65537:
-  //           console.log("login", message);
-  //           break;
-  //         case 262145:
-  //           console.log("list message", message);
-  //           break;
-  //         case 262146:
-  //           console.log("message", message);
-  //           sendJsonMessage({
-  //             ptGroup: 262144,
-  //             ptCommand: 262145,
-  //             params: {
-  //               userId: "test3",
-  //             },
-  //           });
-  //           break;
-  //       }
-  //     },
-  //     shouldReconnect: (closeEvent) => true,
-  //     share: true,
-  //   }
-  // );
-
-  // const handleOnLoginSocket = (data: any) => {
-  //   sendJsonMessage({
-  //     ptCommand: 65537,
-  //     ptGroup: 65536,
-  //     params: {
-  //       deviceType: "web",
-  //       userId: data.userId,
-  //       userPassword: data.userPassword,
-  //     },
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   const tokenmess = requestForToken();
-
-  //   tokenmess
-  //     .then((currentToken) => {
-  //       if (currentToken) {
-  //         console.log("current token for client: ", currentToken);
-  //         setTokenNotification(currentToken);
-  //         // Perform any other neccessary action with the token
-  //       } else {
-  //         // Show permission request UI
-  //         console.log(
-  //           "No registration token available. Request permission to generate one."
-  //         );
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log("An error occurred while retrieving token. ", err);
-  //     });
-  // }, []);
-
-  // useEffect(() => {
-  //   connectedRef.on("value", (snap) => {
-  //     if (user && user?.uid && snap.val()) {
-  //       copyRef.on("child_added", (snap: any) => {
-  //         console.log("snap.val()", snap.val());
-  //         if (snap.val()?.id) {
-  //           console.log("co id");
-  //           window.location.href = `/#${snap.val().url}`;
-  //           // https://baophung020394.github.io/waveasean-moeme-2/#/channel-detail/-NQ8L82ow2YFNh0tAz7P
-  //         } else {
-  //           console.log("k co id");
-  //           // window.location.href = `/#/`;
-  //         }
-  //       });
-
-  //       const userStatusRef = statusRef.child(user?.uid);
-  //       userStatusRef.set(true);
-
-  //       userStatusRef.onDisconnect().remove();
-  //     }
-  //   });
-
-  //   return () => {
-  //     usersRef.off();
-  //     connectedRef.off();
-  //   };
-  // }, [user]);
-
-  // useEffect(() => {
-  //   const unsubFromAuth = dispatch(listenToAuthChanges());
-  //   const unsubFromConnection = dispatch(listenToConnectionChanges());
-
-  //   return () => {
-  //     unsubFromAuth();
-  //     unsubFromConnection();
-  //   };
-  // }, [dispatch]);
 
   if (!isOnline) {
     return (
@@ -186,6 +84,9 @@ function MoeMe() {
           </Route>
           <AuthRoute path="/request-join/:id">
             <JoinChannel />
+          </AuthRoute>
+          <AuthRoute path="/profile">
+            <ProfileView  />
           </AuthRoute>
           {/* <Route path="/register">
             <RegisterView />
