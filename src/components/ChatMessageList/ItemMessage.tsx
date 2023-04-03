@@ -5,6 +5,7 @@ import moment from "moment";
 import React, { useCallback, useState } from "react";
 import { ProgressBar } from "react-bootstrap";
 import { Button, Icon, Image, Modal } from "semantic-ui-react";
+import { formatBytes } from "utils/convertFileSize";
 import { styled } from "utils/styled-component";
 
 interface ItemMessageProps {
@@ -58,8 +59,6 @@ function ItemMessage({
 
   const renderContentFiles = () => {
     if (message?.messageType === "3") {
-      console.log("message viddeo", message);
-      console.log("message viddeo", JSON.parse(message?.attachment));
       return (
         <>
           {/* {selectedFile?.timestamp === message?.timestamp &&
@@ -70,7 +69,13 @@ function ItemMessage({
             )} */}
 
           <div className="chat-file">
-            <a download target="_blank" href={`http://moa.aveapp.com:21405/file/api/down_proc.jsp?type=1&serverfile=${JSON.parse(message?.attachment).save_file}`}>
+            <a
+              download
+              target="_blank"
+              href={`http://moa.aveapp.com:21405/file/api/down_proc.jsp?type=1&serverfile=${
+                JSON.parse(message?.attachment).save_file
+              }`}
+            >
               <Icon name="download" />
             </a>
             <div className="chat-file__infor">
@@ -81,7 +86,9 @@ function ItemMessage({
                   "DD/MM"
                 )}
               </p>
-              <span>Size:{JSON.parse(message?.attachment).file_size}</span>
+              <span>
+                Size:{formatBytes(JSON.parse(message?.attachment).file_size)}
+              </span>
             </div>
           </div>
         </>
@@ -283,7 +290,7 @@ const ItemMessageStyled = styled.div`
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          color: #000
+          color: #000;
         }
 
         &__infor {
@@ -302,7 +309,8 @@ const ItemMessageStyled = styled.div`
           span {
             display: block;
             font-size: 12px;
-            color: #cacaca;
+            font-weight: bold;
+            color: #b8b8b8;
           }
         }
       }
@@ -357,7 +365,8 @@ const ItemMessageStyled = styled.div`
           span {
             display: block;
             font-size: 12px;
-            color: #cacaca;
+            font-weight: bold;
+            color: #b8b8b8;
           }
         }
       }

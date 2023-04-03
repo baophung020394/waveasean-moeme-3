@@ -81,7 +81,6 @@ function Messanger({
         idMessage: myuuid,
         content: value.trim(),
         user: profile,
-        // type: 2,
         file: file
       };
       uploadFileProp(messages);
@@ -179,9 +178,9 @@ function Messanger({
          
           const messages: any = {
             idMessage: myuuid,
-            content: value.trim(),
+            content: "",
             user: profile,
-            type: 2,
+            file: file,
           };
           // console.log("newMessage file", newMessage);
 
